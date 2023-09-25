@@ -1,0 +1,433 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="utf-8" />
+    <title>Krasimpro Workers</title>
+
+    <style>
+        .rrr {
+            border-color: black;
+            border: 1px;
+        }
+
+        td {
+            padding: 0px;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        body {
+            background: #10161d;
+            color: #fff;
+            zoom: 2;
+            -moz-transform: scale(2);
+            -moz-transform-origin: 0 0;
+        }
+
+        .butst {
+            width: 90px;
+            text-align: center;
+            display: block;
+            font-family: arial;
+            text-decoration: none;
+            font-weight: 300;
+            font-size: 14px;
+            border: #1071FF 1px solid;
+            color: #1071FF;
+            padding: 3px;
+            padding-left: 5px;
+            padding-right: 5px;
+            margin: 20px auto;
+            transition: .5s;
+            border-radius: 0px;
+        }
+
+            .butst:hover {
+                top: 5px;
+                transition: .5s;
+                color: #10FF58;
+                border: #10FF58 1px solid;
+                border-radius: 10px;
+            }
+
+            .butst:active {
+                color: #000;
+                border: #1A1A1A 1px solid;
+                transition: .07s;
+                background-color: #FFF;
+            }
+
+        .btn:link,
+        .btn:visited {
+            text-transform: uppercase;
+            text-decoration: none;
+            padding: 15px 40px;
+            display: inline-block;
+            border-radius: 100px;
+            transition: all .2s;
+            position: absolute;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-white {
+            background-color: #fff;
+            color: #777;
+        }
+
+        .btn::after {
+            content: "";
+            display: inline-block;
+            height: 100%;
+            width: 100%;
+            border-radius: 100px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            transition: all .4s;
+        }
+
+        .btn-white::after {
+            background-color: #fff;
+        }
+
+        .btn:hover::after {
+            transform: scaleX(1.4) scaleY(1.6);
+            opacity: 0;
+        }
+
+        .btn-animated {
+            animation: moveInBottom 5s ease-out;
+            animation-fill-mode: backwards;
+        }
+
+        .buttonRed {
+            padding: 16px 42px;
+            border-radius: 3px;
+            margin-top: 10px;
+            box-shadow: 0px 0px 12px -2px rgba(0,0,0,0.5);
+            line-height: 1.25;
+            background: #FC6E51;
+            text-decoration: none;
+            color: white;
+            font-size: 16px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            position: relative;
+            transition: background-color .6s ease;
+            overflow: hidden;
+            &:after
+
+        {
+            content: "";
+            position: absolute;
+            width: 0;
+            height: 0;
+            top: 50%;
+            left: 50%;
+            top: var(--mouse-y);
+            left: var(--mouse-x);
+            transform-style: flat;
+            transform: translate3d(-50%,-50%,0);
+            background: rgba(white,.1);
+            border-radius: 100%;
+            transition: width .3s ease, height .3s ease;
+        }
+
+        &:focus,
+        &:hover {
+            background: darken(#FC6E51,7%);
+        }
+
+        &:active {
+            font-weight: bold;
+            border-radius: 12px;
+        }
+
+        }
+
+        .buttonBlue {
+            padding: 16px 60px;
+            border-radius: 3px;
+            margin-top: 10px;
+            box-shadow: 0px 0px 12px -2px rgba(0,0,0,0.5);
+            line-height: 1.25;
+            background: #497fd1;
+            text-decoration: none;
+            color: white;
+            font-size: 16px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            position: relative;
+            transition: background-color .6s ease;
+            overflow: hidden;
+            &:after
+
+        {
+            content: "";
+            position: absolute;
+            width: 0;
+            height: 0;
+            top: 50%;
+            left: 50%;
+            top: var(--mouse-y);
+            left: var(--mouse-x);
+            transform-style: flat;
+            transform: translate3d(-50%,-50%,0);
+            background: rgba(white,.1);
+            border-radius: 100%;
+            transition: width .3s ease, height .3s ease;
+        }
+
+        &:focus,
+        &:hover {
+            background: darken(#506bc5,7%);
+        }
+
+        &:active {
+            font-weight: bold;
+            border-radius: 12px;
+        }
+        }
+    </style>
+
+    <script type="text/javascript">
+
+
+        async function getProjects() {
+
+            var sel = document.getElementById("projects")
+
+            try {
+                const response = await fetch("/projects", {
+                    method: "GET",
+                    headers: { "custom-header": "application/json" }
+
+                });
+
+                if (response.ok === true) {
+
+                    console.log("OKkk");
+                    const projects = await response.json()
+                    console.log(projects);
+                    for (const project of projects) {
+                        console.log(project)
+                        var option = document.createElement("option");
+                        option.value = project;
+                        option.text = project;
+                        sel.appendChild(option);
+                    }
+
+                }
+                else
+                    console.log("Не ок");
+            }
+            catch (error) {
+                var beginMessage = document.getElementById("beginEndMessage")
+                beginMessage.innerText = `❗ Сервис временно недоступен`
+            }
+
+        }
+
+
+        window.onload = getProjects;
+    </script>
+
+</head>
+
+<body>
+    <div style="width: 100%; margin: 0 auto; text-align: center;">
+        <h1>Учет рабочего времени</h1></br>
+        <table style="margin: auto;">
+            <tr tyle="border: 10; border-color: black;">
+                <td style="border: 10; border-color: black;">
+                    Выберите объект</br>
+                    <select id="projects" name="projects"></select></p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <label>Ваше имя</label></br>
+                    <input type="text" name="name" id="name"><br>
+
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p>
+                        Ваш номер</br>
+                        <input type="number" name="uniq" id="uniq">
+                    </p>
+                </td>
+            </tr>
+        </table>
+
+        <td style="padding: 0px;">
+
+            <p id="beginEndMessage"></p>
+
+
+
+            <button onclick="begin()" class="buttonBlue">Начать</button></br>
+            <button onclick="end()" class="buttonRed">Закончить</button></br>
+    </div>
+
+
+
+
+    <script>
+        //adress = "http://localhost:5000"
+        //adress="http://31.28.27.34:4392"
+
+        async function begin() {
+            const ID = document.getElementById("uniq").value
+            const name = document.getElementById("name").value
+            const status = await CheckWorkerStatus(ID, name)
+            if (status !== 200) {
+                console.log("ВЫ УЖЕ РАБОТАЕТЕ")
+                var p = document.getElementById("beginEndMessage")
+                p.innerText = "❌ Вы уже работаете ❌"
+                return
+            }
+
+            const tBegin = new Date()
+            const project = document.getElementById("projects").value
+            console.log("++++++")
+            console.log(ID)
+            console.log(name)
+            console.log(tBegin)
+            console.log(project)
+
+            const worker = { ID, name, tBegin, project }
+            console.log("=======")
+            console.log(worker)
+
+            try {
+                const response = await fetch(`/newwork`, {
+                    method: "POST",
+                    headers: { "custom-header": "application/json", "Content-Type": "application/json" },
+                    body: JSON.stringify(worker)
+
+                });
+                if (response.ok === true) {
+
+                    var beginMessage = document.getElementById("beginEndMessage")
+                    beginMessage.innerText = `✔️Вы начали работать
+        ${new Date().toLocaleDateString()} в ${new Date().toLocaleTimeString()}
+        хорошей работы`
+
+                }
+                else
+                    beginMessage.innerText = `❌ Сервис временно недоступен`
+            }
+            catch (error) {
+                beginMessage.innerText = `❗ Сервис временно недоступен`
+            }
+
+
+        }
+
+
+        async function CheckWorkerStatus(id, name = null) {
+            console.log("Start checking STATUS")
+            const response = await fetch(`/check/${id}/${name}`, {
+                method: "GET",
+                headers: { "custom-header": "application/json" }
+
+            });
+            const ddd = response.status
+            if (response.ok === true) {
+
+                console.log(ddd)
+
+                return response.status
+
+            }
+            else
+                console.log("Не ок в блоке чек")
+            return response.status
+
+        }
+
+        async function end() {
+            const ID = document.getElementById("uniq").value
+            const status = await CheckWorkerStatus(ID)
+            if (status !== 456) {
+                console.log("ВЫ ЕЩЕ НЕ РАБОТАЕТЕ")
+                var p = document.getElementById("beginEndMessage")
+                p.innerText = "❌Вы еще не работаете❌"
+                return
+            }
+            try {
+                const response = await fetch(`/update`, {
+                    method: "POST",
+                    headers: { "custom-header": "application/json", "Content-Type": "application/json" },
+                    body: JSON.stringify(ID)
+                });
+
+
+                if (response.ok === true) {
+                    const workerRezult = await response.json()
+
+                    const timeOfWork = new Intl.NumberFormat("ru", { style: "decimal" }).format(workerRezult.timeOfWork);
+                    const salary = new Intl.NumberFormat("ru", { style: "currency", currency: "RUB" }).format(workerRezult.salary);
+
+                    var beginMessage = document.getElementById("beginEndMessage")
+                    beginMessage.innerHTML = `👍Вы закончили работать
+        ${new Date().toLocaleDateString()} в ${new Date().toLocaleTimeString()},
+         <br>всего отработанно часов ${timeOfWork}<br>
+        ваша зарплата <font style="color: #7ddd51; font-weight: bold;">${salary}</font> `
+
+                }
+                else
+                    beginMessage.innerText = `❌ Сервис временно недоступен`
+            }
+            catch (error) {
+                beginMessage.innerText = `❗ Сервис временно недоступен`
+            }
+
+        }
+
+        function getProjects() {
+            const tom = {
+                name: "qq",
+                age: 12,
+                project: "Гаражик",
+                tbegin: new Date()
+            };
+            const data = JSON.stringify(tom);
+
+            const xhr = new XMLHttpRequest();
+            console.log("Получаю список проектов");
+            xhr.open("GET", "https://localhost:7084/men");
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onload = () => {
+                if (xhr.status == 200) {
+                    const user = JSON.parse(xhr.responseText)
+                    for (r of user)
+                        console.log(r);
+                    document.getElementById("statusText").innerHTML = `${user[0]}, "-", ${user.age}`;
+                    document.getElementById("list0").innerHTML = `${user[0]}`;
+                    document.getElementById("list1").innerHTML = `${user[1]}`;
+
+                }
+                else {
+                    console.log("Server response: ", xhr.statusText);
+                }
+            }
+            xhr.send("data");
+        }
+    </script>
+</body>
+</html>
