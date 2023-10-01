@@ -6,11 +6,7 @@
     <title>Krasimpro Workers</title>
 
     <style>
-        .rrr {
-            border-color: black;
-            border: 1px;
-        }
-
+        
         td {
             padding: 0px;
             border-collapse: collapse;
@@ -217,11 +213,9 @@
 
                 if (response.ok === true) {
 
-                    console.log("OKkk");
                     const projects = await response.json()
-                    console.log(projects);
+
                     for (const project of projects) {
-                        console.log(project)
                         var option = document.createElement("option");
                         option.value = project;
                         option.text = project;
@@ -287,15 +281,12 @@
 
 
     <script>
-        //adress = "http://localhost:5000"
-        //adress="http://31.28.27.34:4392"
 
         async function begin() {
             const ID = document.getElementById("uniq").value
             const name = document.getElementById("name").value
             const status = await CheckWorkerStatus(ID, name)
             if (status !== 200) {
-                console.log("ВЫ УЖЕ РАБОТАЕТЕ")
                 var p = document.getElementById("beginEndMessage")
                 p.innerText = "❌ Вы уже работаете ❌"
                 return
@@ -303,15 +294,8 @@
 
             const tBegin = new Date()
             const project = document.getElementById("projects").value
-            console.log("++++++")
-            console.log(ID)
-            console.log(name)
-            console.log(tBegin)
-            console.log(project)
 
             const worker = { ID, name, tBegin, project }
-            console.log("=======")
-            console.log(worker)
 
             try {
                 const response = await fetch(`/newwork`, {
@@ -340,19 +324,14 @@
 
 
         async function CheckWorkerStatus(id, name = null) {
-            console.log("Start checking STATUS")
             const response = await fetch(`/check/${id}/${name}`, {
                 method: "GET",
                 headers: { "custom-header": "application/json" }
 
             });
-            const ddd = response.status
+
             if (response.ok === true) {
-
-                console.log(ddd)
-
                 return response.status
-
             }
             else
                 console.log("Не ок в блоке чек")
@@ -364,7 +343,6 @@
             const ID = document.getElementById("uniq").value
             const status = await CheckWorkerStatus(ID)
             if (status !== 456) {
-                console.log("ВЫ ЕЩЕ НЕ РАБОТАЕТЕ")
                 var p = document.getElementById("beginEndMessage")
                 p.innerText = "❌Вы еще не работаете❌"
                 return
@@ -399,35 +377,6 @@
 
         }
 
-        function getProjects() {
-            const tom = {
-                name: "qq",
-                age: 12,
-                project: "Гаражик",
-                tbegin: new Date()
-            };
-            const data = JSON.stringify(tom);
-
-            const xhr = new XMLHttpRequest();
-            console.log("Получаю список проектов");
-            xhr.open("GET", "https://localhost:7084/men");
-            xhr.setRequestHeader("Content-Type", "application/json");
-            xhr.onload = () => {
-                if (xhr.status == 200) {
-                    const user = JSON.parse(xhr.responseText)
-                    for (r of user)
-                        console.log(r);
-                    document.getElementById("statusText").innerHTML = `${user[0]}, "-", ${user.age}`;
-                    document.getElementById("list0").innerHTML = `${user[0]}`;
-                    document.getElementById("list1").innerHTML = `${user[1]}`;
-
-                }
-                else {
-                    console.log("Server response: ", xhr.statusText);
-                }
-            }
-            xhr.send("data");
-        }
     </script>
 </body>
 </html>

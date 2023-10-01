@@ -29,11 +29,14 @@ namespace workersmicro
             app.MapGet("/price", PricePerHour);
             app.MapGet("/projects", SendProjects);
             app.MapGet("/user/workwork", WorkBegin);
+            app.MapGet("/user/workstatus", WorkStatus);
+            app.MapGet("/status", WorkersStatus);
 
 
             app.MapPost("/newwork", InsertInDBNewWork);
             app.MapPost("/twodates", TwoDates);
             app.MapPost("/update", UpdateWorkInDB);
+
 
             app.Run();
 
@@ -133,7 +136,23 @@ namespace workersmicro
                 await httpContext.Response.SendFileAsync("html/index.html");
 
             }
-            
+            async Task WorkStatus(HttpContext httpContext)
+            {
+
+                httpContext.Response.ContentType = "text/html; charset=utf-8";
+                await httpContext.Response.SendFileAsync("html/status.html");
+
+            }
+            async Task WorkersStatus(HttpContext context)
+            {
+                var a = new Dictionary<string, int>();
+                int i = 1;
+                string project = null;
+                var listStatus = await sqlRepo.SelectStatusReportAsync();
+                context.Response.WriteAsJsonAsync(listStatus);
+
+            }
+
         }
     }
 }

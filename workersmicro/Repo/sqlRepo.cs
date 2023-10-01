@@ -242,6 +242,51 @@ namespace workersmicro.Repo
 
 
         }
+        public static async Task<List<WorkerStatus>> SelectStatusReportAsync()
+        {
+
+            try
+            {
+
+                var listStatus = new List<WorkerStatus>();
+                using var con = new NpgsqlConnection(connectionString);
+                con.Open();
+                WorkerStatus workerStatus = null;
+
+
+                var sql = $"select workerinfo.uniq,workerinfo.name,project,workerinfo.workerstatus from rezofwork left join workerinfo on rezofwork.uniq=workerinfo.uniq where rezofwork.id=(select max(id) from rezofwork where rezofwork.uniq=workerinfo.uniq) order by workerstatus desc";
+                await Console.Out.WriteLineAsync(sql);
+                using var cmd = new NpgsqlCommand(sql, con);
+                using NpgsqlDataReader? rdr = cmd.ExecuteReader();
+
+
+                while (await rdr.ReadAsync())
+
+                {
+                    listStatus.Add(new WorkerStatus
+                    {
+                        uniq = rdr.IsDBNull("uniq") ? 0 : rdr.GetInt64("uniq"),
+                        name = rdr.IsDBNull("name") ? "Нет имени" : rdr.GetString("name"),
+                        project = rdr.IsDBNull("project") ? "Нет имени" : rdr.GetString("project"),
+                        status = rdr.IsDBNull("workerstatus") ? false : rdr.GetBoolean("workerstatus"),
+
+                    });
+                }
+
+
+
+                con.Close();
+                return listStatus;
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Ошипка\n" + ex);
+                return null;
+            }
+
+
+        }
 
         public static async Task InsertInDBAsync(WorkRezult workRezult)
         {

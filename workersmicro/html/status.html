@@ -1,0 +1,124 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        @media (min-width: 300px) {
+            html {
+                font-size: 10px;
+            }
+        }
+
+        @media (min-width: 720px) {
+            html {
+                font-size: 20px;
+            }
+        }
+        table {
+            text-align: center;
+            align-self: center;
+            display: inline-block;
+            font-size: x-large;
+        }
+
+        tr {
+            border: 2px;
+            border-color: blueviolet;
+            box-shadow: 5px 2px 2px rgb(155, 144, 144);
+        }
+    </style>
+</head>
+<body>
+    <table>
+        <thead><tr><th>Номер</th><th>Идентификатор</th><th>Имя</th><th>Объект</th><th>Статус</th><th></th></tr></thead>
+        <tbody>
+        </tbody>
+    </table>
+    <br>
+    <br>
+    <table>
+        <thead><tr><th>Объект</th><th>Сейчас работают</th></tr></thead>
+        <tbody id="online">
+        </tbody>
+    </table>
+    <script>
+        async function getStatus() {
+            const response = await fetch("/status", {
+                method: "GET",
+                headers: { "custom-header": "application/json" }
+
+            })
+            if (response.ok === true) {
+                var workerOrderedNumber = 1
+                var customObject = new Object()
+
+                const listWorkers = await response.json()
+                const rows = document.querySelector("tbody");
+                for (const i in listWorkers) {
+
+                    const tr = document.createElement("tr");
+                    tr.setAttribute("data-rowid", 0);
+
+                    const number = document.createElement("td");
+                    number.append(workerOrderedNumber);
+                    tr.append(number);
+
+                    const uniq = document.createElement("td");
+                    uniq.append(listWorkers[i].uniq);
+                    tr.append(uniq);
+
+                    const name = document.createElement("td");
+                    name.append(listWorkers[i].name);
+                    tr.append(name);
+                    const project = document.createElement("td");
+                    project.append(listWorkers[i].project);
+                    tr.append(project);
+                    const satus = document.createElement("td");
+                    if (listWorkers[i].status == true) {
+                        satus.append("🟢");
+                        if (customObject.hasOwnProperty(listWorkers[i].project))
+                            customObject[listWorkers[i].project] += 1
+                        else
+                            customObject[listWorkers[i].project] = 1
+                    }
+                    else
+                        satus.append("🔴");
+                    tr.append(satus);
+                    rows.append(tr)
+                    workerOrderedNumber++
+                }
+
+                const workerCountTB = document.getElementById("online")
+
+                for (const key in customObject) {
+                    const trCount = document.createElement("tr");
+                    const projectCount = document.createElement("td");
+                    projectCount.append(key)
+                    trCount.append(projectCount)
+
+                    const prCount = document.createElement("td");
+                    prCount.append(customObject[key])
+                    trCount.append(prCount)
+
+
+                    workerCountTB.append(trCount)
+
+                }
+
+            }
+            else
+                console.log("Error")
+
+
+
+        }
+
+
+        window.onload = getStatus;
+       
+    </script>
+
+</body>
+</html>
