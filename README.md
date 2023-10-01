@@ -17,4 +17,5 @@ ASP.NET CORE
  :small_blue_diamond: зарплата по каждому рабочему за неделю<br />
  :small_blue_diamond: отчет начиная с конкретной даты<br />
  :small_blue_diamond: отчет в промежутке между двумя датами<br />
+ :small_blue_diamond: онлайн проверка кто работает и на каких объектах<br />
   </div>
