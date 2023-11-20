@@ -6,7 +6,11 @@
     <title>Krasimpro Workers</title>
 
     <style>
-        
+        .rrr {
+            border-color: black;
+            border: 1px;
+        }
+
         td {
             padding: 0px;
             border-collapse: collapse;
@@ -213,9 +217,11 @@
 
                 if (response.ok === true) {
 
+                    console.log("OKkk");
                     const projects = await response.json()
-
+                    console.log(projects);
                     for (const project of projects) {
+                        console.log(project)
                         var option = document.createElement("option");
                         option.value = project;
                         option.text = project;
@@ -287,6 +293,7 @@
             const name = document.getElementById("name").value
             const status = await CheckWorkerStatus(ID, name)
             if (status !== 200) {
+                console.log("ВЫ УЖЕ РАБОТАЕТЕ")
                 var p = document.getElementById("beginEndMessage")
                 p.innerText = "❌ Вы уже работаете ❌"
                 return
@@ -294,8 +301,15 @@
 
             const tBegin = new Date()
             const project = document.getElementById("projects").value
+            console.log("++++++")
+            console.log(ID)
+            console.log(name)
+            console.log(tBegin)
+            console.log(project)
 
             const worker = { ID, name, tBegin, project }
+            console.log("=======")
+            console.log(worker)
 
             try {
                 const response = await fetch(`/newwork`, {
@@ -324,14 +338,19 @@
 
 
         async function CheckWorkerStatus(id, name = null) {
+            console.log("Start checking STATUS")
             const response = await fetch(`/check/${id}/${name}`, {
                 method: "GET",
                 headers: { "custom-header": "application/json" }
 
             });
-
+            const ddd = response.status
             if (response.ok === true) {
+
+                console.log(ddd)
+
                 return response.status
+
             }
             else
                 console.log("Не ок в блоке чек")
@@ -341,8 +360,10 @@
 
         async function end() {
             const ID = document.getElementById("uniq").value
-            const status = await CheckWorkerStatus(ID)
-            if (status !== 456) {
+            const name = document.getElementById("name").value
+            const status = await CheckWorkerStatus(ID,name)
+            if (status !== 201) {
+                console.log("ВЫ ЕЩЕ НЕ РАБОТАЕТЕ")
                 var p = document.getElementById("beginEndMessage")
                 p.innerText = "❌Вы еще не работаете❌"
                 return
@@ -357,6 +378,7 @@
 
                 if (response.ok === true) {
                     const workerRezult = await response.json()
+                    console.log(workerRezult)
 
                     const timeOfWork = new Intl.NumberFormat("ru", { style: "decimal" }).format(workerRezult.timeOfWork);
                     const salary = new Intl.NumberFormat("ru", { style: "currency", currency: "RUB" }).format(workerRezult.salary);
@@ -377,6 +399,7 @@
 
         }
 
+       
     </script>
 </body>
 </html>

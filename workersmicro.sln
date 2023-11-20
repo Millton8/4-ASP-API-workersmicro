@@ -5,6 +5,8 @@ VisualStudioVersion = 17.7.34024.191
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "workersmicro", "workersmicro\workersmicro.csproj", "{C4F9A806-9D31-4670-BC49-0EF558C528A1}"
 EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "pyFastApi", "pyFastApi\pyFastApi.pyproj", "{70881140-67CE-4716-A446-3FD9F51BF6BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,8 @@ Global
 		{C4F9A806-9D31-4670-BC49-0EF558C528A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4F9A806-9D31-4670-BC49-0EF558C528A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C4F9A806-9D31-4670-BC49-0EF558C528A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70881140-67CE-4716-A446-3FD9F51BF6BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70881140-67CE-4716-A446-3FD9F51BF6BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

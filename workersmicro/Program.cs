@@ -1,3 +1,4 @@
+using workersmicro.MiddleWare;
 using workersmicro.Model;
 using workersmicro.Repo;
 
@@ -13,6 +14,10 @@ namespace workersmicro
             builder.Services.AddCors();
             builder.Services.AddSingleton(builder.Configuration);
             var app = builder.Build();
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+
             var pirecePerHourList = new Dictionary<string, int>();
             var listOfWorkersID = new List<long?>();
             
@@ -28,13 +33,9 @@ namespace workersmicro
             app.MapGet("/fast",FastSelect);
             app.MapGet("/price", PricePerHour);
             app.MapGet("/projects", SendProjects);
-            app.MapGet("/user/workwork", WorkBegin);
-            app.MapGet("/user/workstatus", WorkStatus);
-            app.MapGet("/status", WorkersStatus);
-
+            app.MapGet("/twodates/{date1}/{date2?}", TwoDates);
 
             app.MapPost("/newwork", InsertInDBNewWork);
-            app.MapPost("/twodates", TwoDates);
             app.MapPost("/update", UpdateWorkInDB);
 
 
@@ -72,7 +73,7 @@ namespace workersmicro
                 }
                 if (string.IsNullOrWhiteSpace(id.ToString()))
                 {
-                    httpContext.Response.StatusCode = 498;
+                    httpContext.Response.StatusCode = 500;
                     return;
                 }
 
@@ -80,17 +81,16 @@ namespace workersmicro
                 if (status == false)
                     httpContext.Response.StatusCode = 200;
                 else
-                    httpContext.Response.StatusCode = 456;
+                    httpContext.Response.StatusCode = 201;
             }
             async Task FastSelect(HttpContext httpContext)
             {                
                 var listOfWorkersSalary =await sqlRepo.FastSelectAsync();
                 await httpContext.Response.WriteAsJsonAsync(listOfWorkersSalary);
             }
-            async Task TwoDates(HttpContext httpContext)
+            async Task TwoDates(HttpContext httpContext, string date1, string date2)
             {
-                var twoDates = await httpContext.Request.ReadFromJsonAsync<string>();
-                var listOfWorkersSalary = await sqlRepo.SelectBetweenTwoDatesAsync(twoDates);
+                var listOfWorkersSalary = await sqlRepo.SelectBetweenTwoDatesAsync(date1, date2);
                 await httpContext.Response.WriteAsJsonAsync(listOfWorkersSalary);
             }
             async Task PricePerHour(HttpContext httpContext)
@@ -101,57 +101,28 @@ namespace workersmicro
             async Task InsertInDBNewWork(HttpContext httpContext)
             {
                 var worker = await httpContext.Request.ReadFromJsonAsync<WorkRezult>();
-                
+                worker.tBegin = DateTime.Now;
                 pirecePerHourList = await sheetsRepo.ReadPricePerHourAsync();
+
+
                 if (pirecePerHourList.ContainsKey(worker.ID.ToString()))
                     worker.pricePerHour = pirecePerHourList[worker.ID.ToString()];
                 else
                     worker.pricePerHour = 222;
-
                 await sqlRepo.InsertInDBAsync(worker);
-                await sqlRepo.UpdateWorkerStatusAsync(worker.ID,true);
             }
             async Task UpdateWorkInDB(HttpContext httpContext)
             {
-                try
-                {
                     var workerID = await httpContext.Request.ReadFromJsonAsync<long>();
                     var workerRezult = await sqlRepo.SelectWorkerLastRowByID(workerID);
                     workerRezult.AddInfo();
+
                     await httpContext.Response.WriteAsJsonAsync(workerRezult);
                     await sqlRepo.UpdateInDBAsync(workerRezult);
-                    await sqlRepo.UpdateWorkerStatusAsync(workerID, false);
                     await sheetsRepo.WriteAsync(workerRezult);
-                }
-                catch (Exception ex)
-                {
-                    await Console.Out.WriteLineAsync("Ошипка в блоке update\n"+ex);
-                }
+              
             }
 
-            async Task WorkBegin(HttpContext httpContext)
-            {
-
-                httpContext.Response.ContentType = "text/html; charset=utf-8";
-                await httpContext.Response.SendFileAsync("html/index.html");
-
-            }
-            async Task WorkStatus(HttpContext httpContext)
-            {
-
-                httpContext.Response.ContentType = "text/html; charset=utf-8";
-                await httpContext.Response.SendFileAsync("html/status.html");
-
-            }
-            async Task WorkersStatus(HttpContext context)
-            {
-                var a = new Dictionary<string, int>();
-                int i = 1;
-                string project = null;
-                var listStatus = await sqlRepo.SelectStatusReportAsync();
-                context.Response.WriteAsJsonAsync(listStatus);
-
-            }
 
         }
     }

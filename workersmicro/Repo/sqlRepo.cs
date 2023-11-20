@@ -110,7 +110,7 @@ namespace workersmicro.Repo
 
 
         }
-        public static async Task<List<WorkerSalary>> SelectBetweenTwoDatesAsync(string date)
+        public static async Task<List<WorkerSalary>> SelectBetweenTwoDatesAsync(string date1, string date2)
         {
             try
             {
@@ -121,24 +121,18 @@ namespace workersmicro.Repo
                 string[] twoDatesString = null;
                 string sql = null;
 
-                foreach (var c in date)
+
+                if (date2 != "0")
                 {
-                    if (c == ' ')
-                        isTwoDate = true;
-                }
-                if (isTwoDate)
-                {
-                    
-                    twoDatesString = date.Split(' ');
-                    sql = $"SELECT uniq,name, SUM(salary) FROM rezofwork WHERE tbegin>='{twoDatesString[0]}' AND tbegin<'{twoDatesString[1]}' GROUP BY uniq,name;";
+
+                    sql = $"SET datestyle = dmy;SELECT uniq,name, SUM(salary) FROM rezofwork WHERE tbegin>='{date1}' AND tbegin<'{date2}' GROUP BY uniq,name;";
                 }
                 else
-                    sql = $"SELECT uniq,name, SUM(salary) FROM rezofwork WHERE tbegin>='{date}' GROUP BY uniq,name;";
+                    sql = $"SET datestyle = dmy;SELECT uniq,name, SUM(salary) FROM rezofwork WHERE tbegin>='{date1}' GROUP BY uniq,name;";
 
 
                 using var cmd = new NpgsqlCommand(sql, con);
                 using NpgsqlDataReader? rdr = cmd.ExecuteReader();
-                
 
                 while (await rdr.ReadAsync())
                 {
@@ -202,91 +196,6 @@ namespace workersmicro.Repo
 
 
         }
-        public static async Task<WorkRezult> SelectAllWorkersInfoAsync()
-        {
-            try
-            {
-                using var con = new NpgsqlConnection(connectionString);
-                con.Open();
-                WorkRezult worker = null;
-
-                var sql = $"SELECT * FROM rezofwork";
-                using var cmd = new NpgsqlCommand(sql, con);
-                using NpgsqlDataReader? rdr = cmd.ExecuteReader();
-
-                while (await rdr.ReadAsync())
-
-                {
-                    worker = new WorkRezult
-                    {
-                        ID = rdr.IsDBNull("uniq") ? 0 : rdr.GetInt64("uniq"),
-                        name = rdr.IsDBNull("name") ? "Нет имени" : rdr.GetString("name"),
-                        project = rdr.IsDBNull("project") ? "Нет проекта" : rdr.GetString("project"),
-                        tBegin = rdr.IsDBNull("tbegin") ? DateTime.MinValue : rdr.GetDateTime("tbegin"),
-                        pricePerHour = rdr.IsDBNull("price") ? 222 : rdr.GetInt16("price")
-                    };
-                    await Console.Out.WriteLineAsync("in Select by id\n" + worker.ID + "\t" + worker.name + "\t" + worker.project+ "\t" +worker.tBegin + "\t" + worker.pricePerHour);
-                }
-
-
-
-                con.Close();
-                return worker;
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Ошипка\n" + ex);
-                return null;
-            }
-
-
-        }
-        public static async Task<List<WorkerStatus>> SelectStatusReportAsync()
-        {
-
-            try
-            {
-
-                var listStatus = new List<WorkerStatus>();
-                using var con = new NpgsqlConnection(connectionString);
-                con.Open();
-                WorkerStatus workerStatus = null;
-
-
-                var sql = $"select workerinfo.uniq,workerinfo.name,project,workerinfo.workerstatus from rezofwork left join workerinfo on rezofwork.uniq=workerinfo.uniq where rezofwork.id=(select max(id) from rezofwork where rezofwork.uniq=workerinfo.uniq) order by workerstatus desc";
-                await Console.Out.WriteLineAsync(sql);
-                using var cmd = new NpgsqlCommand(sql, con);
-                using NpgsqlDataReader? rdr = cmd.ExecuteReader();
-
-
-                while (await rdr.ReadAsync())
-
-                {
-                    listStatus.Add(new WorkerStatus
-                    {
-                        uniq = rdr.IsDBNull("uniq") ? 0 : rdr.GetInt64("uniq"),
-                        name = rdr.IsDBNull("name") ? "Нет имени" : rdr.GetString("name"),
-                        project = rdr.IsDBNull("project") ? "Нет имени" : rdr.GetString("project"),
-                        status = rdr.IsDBNull("workerstatus") ? false : rdr.GetBoolean("workerstatus"),
-
-                    });
-                }
-
-
-
-                con.Close();
-                return listStatus;
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Ошипка\n" + ex);
-                return null;
-            }
-
-
-        }
 
         public static async Task InsertInDBAsync(WorkRezult workRezult)
         {
@@ -295,7 +204,7 @@ namespace workersmicro.Repo
                 using var con = new NpgsqlConnection(connectionString);
                 con.Open();
  
-                var sqlInsert = $"INSERT INTO rezofwork (id,uniq,name,project,tbegin,price) VALUES (DEFAULT,@ID,@name,@project,@tBegin,@price);";
+                var sqlInsert = $"INSERT INTO rezofwork (id,uniq,name,project,tbegin,price) VALUES (DEFAULT,@ID,@name,@project,@tBegin,@price);UPDATE workerinfo SET workerstatus=true WHERE uniq={workRezult.ID};";
 
                 await using (var cmdInsert = new NpgsqlCommand(sqlInsert, con)) {
 
@@ -325,7 +234,7 @@ namespace workersmicro.Repo
             {
                 using var con = new NpgsqlConnection(connectionString);
                 con.Open();
-                var sqlUpdate = $"UPDATE rezofwork SET tend=@tEnd,timeofwork=@timeofwork,salary=@salary where id=(select max(id) from rezofwork) and uniq=@ID;";
+                var sqlUpdate = $"UPDATE rezofwork SET tend=@tEnd,timeofwork=@timeofwork,salary=@salary where id=(SELECT MAX(id) FROM rezofwork WHERE uniq=@ID);UPDATE workerinfo SET workerstatus=false WHERE uniq={workRezult.ID};";
 
                 await using (var cmdInsert = new NpgsqlCommand(sqlUpdate, con))
                 {
